@@ -1,0 +1,7 @@
+-cp src
+-main Test
+-swf-version 11
+-swf bin/main.swf
+-lib msignal
+-debug
+-swf-header 1280:720:32:eeeeee 
