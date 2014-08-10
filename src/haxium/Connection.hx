@@ -37,12 +37,18 @@ class Connection extends flash.net.Socket
 
 	public function send(url:String, method:String)
 	{
+		/*
 		trace("send ::: " + url + " /// " + method);
 		var sendString = "POST /wd/hub/status HTTP/1.1\r\n"
 			+ "Host: " + host + "\r\n"
 			+ "\r\n";
 		trace(sendString);
 		writeMultiByte(sendString, ENCODING);
+		*/
+
+		var req = new haxium.Request(host, "/wd/hub/status");
+		trace(req.get());
+		writeMultiByte(req.get(), ENCODING);
 	}
 
 	function socketConnected(_)
