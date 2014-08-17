@@ -2,6 +2,7 @@
 -main Test
 -swf-version 11
 -swf bin/main.swf
--lib msignal
--debug
 -swf-header 800:600:32:CCCCCC
+-lib msignal
+# -cpp bin/client
+-debug

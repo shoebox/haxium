@@ -1,22 +1,29 @@
 package;
 
-import haxium.Haxium;
+import haxium.client.HaxiumDriver;
+
+//import haxium.Haxium;
 
 class Test
 {
+	static var driver:HaxiumDriver;
+
 	static public function main()
 	{
 		trace('constructor');
 
-		/*
-		socket = new Socket();
-		socket.addEventListener(Event.CONNECT, connected);
-		socket.addEventListener(IOErrorEvent.IO_ERROR, ioError);
-		socket.addEventListener(Event.CLOSE, connectionClose);
-		socket.addEventListener(flash.events.ProgressEvent.SOCKET_DATA, onDatas);
-		socket.connect("localhost", 8484);
+		driver = new HaxiumDriver();
+		driver.connected.add(whenConnected);
+		driver.connect("localhost", 1234);
 	}
 
+	static function whenConnected()
+	{
+		trace("whenConnected");
+		driver.createSession();
+	}
+
+	/*
 	static function ioError(e:IOErrorEvent)
 	{
 		trace("error /// " + e);
@@ -45,9 +52,9 @@ class Test
 		socket.writeMultiByte(sendString, "application/json;charset=UTF-8");
 		*/
 
-		var haxium:Haxium = new Haxium();
-		haxium.connect("localhost", 8484);
+		//var haxium:Haxium = new Haxium();
+		//haxium.open("localhost", 8484);
 		
-	}
+	
 
 }
