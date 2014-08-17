@@ -84,7 +84,9 @@ class HaxiumSocket
 
 	function onSocket_datas(e:Dynamic)
 	{
-		trace("onSocket_datas ::: " + socket.readByte());
+		trace("onSocket_datas ::: " + e);
+		trace(socket.bytesAvailable);
+		trace(socket.readUTFBytes(socket.bytesAvailable));
 	}
 
 	#end
