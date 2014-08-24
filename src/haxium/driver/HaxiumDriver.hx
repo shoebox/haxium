@@ -1,4 +1,4 @@
-package haxium.client;
+package haxium.driver;
 
 import haxe.io.Bytes;
 
@@ -15,10 +15,12 @@ import msignal.Signal.Signal0;
 class HaxiumDriver extends HaxiumSocket
 {
 	public var connected:Signal0;
+	public var filters(default, null):Array<Filter<Dynamic>>;
 
 	public function new()
 	{
 		super();
+		filters = [new Filter<String>(PACKAGE, "org.shoebox.haxium")];
 		connected = new Signal0();
 	}
 
@@ -35,9 +37,20 @@ class HaxiumDriver extends HaxiumSocket
 
 	public function createSession()
 	{
-		var filters = [new Filter<String>(PACKAGE, EQUAL, "org.shoebox.haxium")];
 		var action = new SessionAction(CREATE, filters);
-		var s = Serializer.run(action);
-		send(Bytes.ofString(s));
+		sendSessionAction(action, filters);
+	}
+
+	public function listSessions(?filters:Array<Filter<Dynamic>>)
+	{
+		var action = new SessionAction(LIST, filters);
+		sendSessionAction(action, filters);
+	}
+
+	function sendSessionAction(action:Sessionaction, 
+		?filters:Array<Filter<Dynamic>>)
+	{
+		var result = Serializer.run(action);
+		send(Bytes.ofString(result));
 	}
 }

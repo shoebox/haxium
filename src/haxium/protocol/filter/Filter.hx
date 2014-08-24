@@ -9,7 +9,8 @@ class Filter<T>
 	public var condition:FilterCondition;
 	public var value:T;
 
-	public function new(filter:FilterType, condition:FilterCondition, value:T)
+	public function new(filter:FilterType, value:T, 
+		?condition:FilterCondition)
 	{
 		this.filter = filter;
 		this.condition = condition;

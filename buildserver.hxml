@@ -1,3 +1,4 @@
 -neko server.n 
 -cp src
 -main TestServer
+-lib msignal

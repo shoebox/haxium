@@ -4,6 +4,7 @@ import haxe.io.Bytes;
 import haxe.Serializer;
 import haxe.Unserializer;
 
+import haxium.protocol.action.AbstractAction;
 import haxium.protocol.action.SessionAction;
 import haxium.protocol.ActionType;
 import haxium.server.RemoteClient;
@@ -13,7 +14,11 @@ import neko.net.ThreadServer;
 
 import sys.net.Socket;
 
-class HaxiumServer extends ThreadServer<RemoteClient, Dynamic>
+typedef Client = {
+  var id : Int;
+}
+
+class HaxiumServer extends ThreadServer<RemoteClient, SessionAction>
 {
 	public var sessions:Sessions;
 
@@ -28,13 +33,21 @@ class HaxiumServer extends ThreadServer<RemoteClient, Dynamic>
 		return new RemoteClient(s);
 	}
 
-	override function readClientMessage(client:RemoteClient, buf:Bytes, pos:Int, len:Int):Dynamic
+	override function readClientMessage(client:RemoteClient, buf:Bytes, 
+		pos:Int, len:Int)
 	{
-		var o = Unserializer.run(buf.toString());
-		if (Std.is(o, SessionAction))
-			return sessions.execute(cast o, client);
+		var cpos = pos;
+		var msg = buf.getString(pos,  len);
+		var o = Unserializer.run(msg);
 		
-		return null;
+		var action:SessionAction = null;
+		if (Std.is(o, SessionAction))
+		{
+			action = cast o;
+			sessions.execute(action, client);
+		}
+
+		return {msg:action, bytes: len};
 	}
 
 	override function clientDisconnected(c:RemoteClient)

@@ -2,6 +2,9 @@ package haxium.utils;
 
 import haxe.io.Bytes;
 
+import haxe.Serializer;
+import haxe.Unserializer;
+import haxium.protocol.action.AbstractAction;
 import msignal.Signal;
 
 #if flash
@@ -19,8 +22,7 @@ import sys.net.Host;
 class HaxiumSocket
 {
 	public var opened:Signal0;
-
-	var socket:Socket;
+	public var socket:Socket;
 
 	public function new()
 	{
@@ -57,11 +59,16 @@ class HaxiumSocket
 
 	public function send(datas:Bytes)
 	{
+		sendDatas(socket, datas);
+	}
+
+	static public function sendDatas(socket:Socket, datas:Bytes)
+	{
 		#if flash
 			socket.writeBytes(datas.getData(), 0, datas.length);
 			socket.flush();
 		#else
-			socket.output.writeBytes(data, 0, datas.length);
+			socket.output.writeBytes(datas, 0, datas.length);
 			socket.output.flush();
 		#end
 	}
@@ -85,11 +92,27 @@ class HaxiumSocket
 	function onSocket_datas(e:Dynamic)
 	{
 		trace("onSocket_datas ::: " + e);
-		trace(socket.bytesAvailable);
-		trace(socket.readUTFBytes(socket.bytesAvailable));
+		//trace(socket.bytesAvailable);
+		//trace(socket.readUTFBytes(socket.bytesAvailable));
+
+		var data = socket.readUTFBytes(socket.bytesAvailable);
+		parseDatas(data);
 	}
 
 	#end
+
+	public function sendAction(action:AbstractAction)
+	{
+		var s = Serializer.run(action);
+		var b = Bytes.ofString(s);
+		send(b);
+	}
+
+	function parseDatas(raw:String)
+	{
+		var d = Unserializer.run(raw);
+		trace(d);
+	}
 
 	function whenConnected(_)
 	{

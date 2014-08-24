@@ -1,6 +1,6 @@
 package;
 
-import haxium.client.HaxiumDriver;
+import haxium.driver.HaxiumDriver;
 
 //import haxium.Haxium;
 

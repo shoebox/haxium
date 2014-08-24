@@ -7,7 +7,8 @@ class SessionAction extends AbstractAction
 {
 	public var filters:Array<Filter<Dynamic>>;
 
-	public function new(type:SessionActionType, filters:Array<Filter<Dynamic>>)
+	public function new(type:SessionActionType, 
+		?filters:Array<Filter<Dynamic>>)
 	{
 		super(type);
 		this.type = type;
@@ -18,4 +19,7 @@ class SessionAction extends AbstractAction
 enum SessionActionType
 {
 	CREATE;
+	CREATED;
+	LIST;
+	SELECT;
 }
