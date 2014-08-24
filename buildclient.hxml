@@ -1,0 +1,5 @@
+-cp src
+-main TestClient
+-lib msignal
+-cpp bin/client
+-debug
