@@ -1,9 +1,11 @@
 package haxium.server;
 
 import haxe.crypto.Md5;
+import haxe.io.BytesOutput;
+
 import haxium.protocol.filter.Filter;
 import haxium.protocol.session.SessionProtocol;
-import haxium.protocol.session.SessionProtocol.SessionAction;
+import haxium.protocol.session.SessionProtocol;
 
 import haxium.server.Client;
 
@@ -26,12 +28,23 @@ class Sessions
 			case SessionProtocol.CLOSE:
 
 			case SessionProtocol.CREATE:
-				session = createSession(client, action.filters);
-			
+				trace("create");
+				//session = createSession(client, action.filters);
+
 			case SessionProtocol.GET:
+				trace("get");
 				session = findSession(action.filters);
 				
 			case SessionProtocol.LIST:
+		}
+
+		if (session != null)
+		{
+			var output = new BytesOutput();
+			output.writeInt32(SessionProtocol.RESPONSE);
+			output.writeString(session.id);
+
+			client.socket.output.write(output.getBytes());
 		}
 	}
 
@@ -41,6 +54,8 @@ class Sessions
 		trace("createSession");
 		var session = new Session(client, filter);
 		map.set(session.id, session);
+		list.push(session);
+
 		return session;
 	}
 

@@ -39,6 +39,7 @@ class Server extends ThreadServer<Client, Dynamic>
 		switch (type)
 		{
 			case SessionProtocol.CREATE 
+				| SessionProtocol.JOIN
 				| SessionProtocol.LIST 
 				| SessionProtocol.GET 
 				| SessionProtocol.CLOSE:

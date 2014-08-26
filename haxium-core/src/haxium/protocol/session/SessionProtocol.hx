@@ -9,9 +9,16 @@ import haxium.protocol.filter.Filter;
 class SessionProtocol
 {
 	public static inline var CREATE = 0x100;
-	public static inline var LIST = 0x101;
-	public static inline var GET = 0x102;
-	public static inline var CLOSE = 0x103;	
+	public static inline var CLOSE = 0x101;
+	public static inline var JOIN = 0x102;
+	public static inline var LIST = 0x103;
+	public static inline var GET = 0x104;
+	public static inline var RESPONSE = 0x105;
+
+	public function new()
+	{
+
+	}
 }
 
 class SessionAction
@@ -39,10 +46,13 @@ class SessionAction
 			action.filters.length);
 
 		var bytes:Bytes;
-		for(filter in action.filters)
+		if (action.filters != null)
 		{
-			bytes = filter.serialize();
-			output.write(bytes);
+			for (filter in action.filters)
+			{
+				bytes = filter.serialize();
+				output.write(bytes);
+			}
 		}
 
 		return output.getBytes();
