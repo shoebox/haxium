@@ -1,128 +1,84 @@
 package haxium.server;
 
-import haxe.crypto.Md5;
-import haxe.io.BytesOutput;
-
+import haxium.protocol.ClientSession;
+import haxium.protocol.Hook;
 import haxium.protocol.filter.Filter;
-import haxium.protocol.session.SessionProtocol;
-import haxium.protocol.session.SessionProtocol;
+import haxium.protocol.session.SessionSpec;
 
-import haxium.server.Client;
+#if flash
+import flash.net.Socket;
+#else
+import sys.net.Socket;
+#end
 
 class Sessions
 {
-	var list:Array<Session>;
-	var map:Map<String, Session>;
+	var list:Array<ClientSession>;
+	var sockets:Map<String, Socket>;
 
 	public function new()
 	{
 		list = [];
-		map = new Map();
+		sockets = new Map();
 	}
 
-	public function execute(client:Client, action:SessionAction)
+	public function create(specs:DSessionSpecs, socket:Socket):ClientSession
 	{
-		var session:Session = null;
-		switch (action.type)
-		{
-			case SessionProtocol.CLOSE:
-
-			case SessionProtocol.CREATE:
-				trace("create");
-				//session = createSession(client, action.filters);
-
-			case SessionProtocol.GET:
-				trace("get");
-				session = findSession(action.filters);
-				
-			case SessionProtocol.LIST:
-		}
-
-		if (session != null)
-		{
-			var output = new BytesOutput();
-			output.writeInt32(SessionProtocol.RESPONSE);
-			output.writeString(session.id);
-
-			client.socket.output.write(output.getBytes());
-		}
-	}
-
-	function createSession(client:Client, 
-		filter:Array<Filter<Dynamic>>):Session
-	{
-		trace("createSession");
-		var session = new Session(client, filter);
-		map.set(session.id, session);
+		var session = new ClientSession(specs);
 		list.push(session);
-
+		sockets.set(session.id, socket);
 		return session;
 	}
 
-	function findSession(filters:Array<Filter<Dynamic>>):Null<Session>
+	public function get(filters:DFilters):Array<ClientSession>
 	{
-		var result = false;
+		var result = [];
 		for (session in list)
 		{
-			result = testFilter(session, filters);
-			if (result)
-				return session;
+			if (testSessionFor(session, filters))
+				result.push(session);
 		}
 
-		return null;
+		return result;
 	}
 
-	function testFilter(session:Session, 
-		filters:Array<Filter<Dynamic>>):Bool
+	public function hook(filters:DFilters):Hook
+	{
+		var sessions = get(filters);
+		var hook = new Hook(sessions);
+
+		return hook;
+	}
+
+	inline function testSessionFor(session:ClientSession, filters:DFilters):Bool
 	{
 		var result = true;
-		for (sessionFilter in session.filters)
+		for (filter in filters)
 		{
-			for (filter in filters)
+			for (spec in session.specs)
 			{
-				switch (filter.filter)
+				if (spec.type == filter.spec)
 				{
-					case ABSTRACT | PACKAGE: //TODO:Package handling
-						result = compareAbstract(sessionFilter.value, 
-							filter.value, filter.condition);
+					result = switch (filter.condition)
+					{
+						case EQUAL:
+							spec.value == filter.value;
 
-					case VERSION:
+						case INF:
+							//TODO
+							spec.value < filter.value;
+
+						case SUP:
+							//TODO
+							spec.value > filter.value;
+					}
 				}
-
-				if (!result)
-					break;
 			}
-		}
-		
-		return result;
-	}
 
-	function compareAbstract(value1:Dynamic, value2:Dynamic, 
-		condition:FilterCondition)
-	{
-		var result = false;
-		switch (condition)
-		{
-			case EQUAL:
-				result = value1 == value2;
-
-			default:
+			if (!result)
+				break;
 		}
 
 		return result;
-	}
-}
-
-class Session
-{
-	public var client(default, null):Client;
-	public var filters(default, null):Array<Filter<Dynamic>>;
-	public var id(default, null):String;
-
-	public function new(client:Client, filters:Array<Filter<Dynamic>>)
-	{
-		this.client = client;
-		this.filters = filters;
-		this.id = Md5.encode(Date.now().toString());
 	}
 }

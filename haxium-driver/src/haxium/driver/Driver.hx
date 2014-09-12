@@ -1,7 +1,10 @@
 package haxium.driver;
 
+import haxe.io.Bytes;
+
+import haxium.protocol.session.SessionSpec;
+import haxium.protocol.RemoteProtocol;
 import haxium.utils.HaxiumSocket;
-import haxium.protocol.session.SessionProtocol;
 
 class Driver extends HaxiumSocket
 {
@@ -10,12 +13,13 @@ class Driver extends HaxiumSocket
 		super();
 	}
 
-	override function whenConnected(_)
+	public function create(specs:SessionSpec)
 	{
-		super.whenConnected(null);
-		trace("whenConnected");
+		RemoteProtocol.create(this, specs.get());
+	}
 
-		var action = new SessionAction(SessionProtocol.CREATE);
-		send(SessionAction.serialize(action));
+	override function onRawDatas(bytes:Bytes)
+	{
+		trace("onRawDatas");
 	}
 }

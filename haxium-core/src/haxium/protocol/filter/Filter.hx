@@ -4,54 +4,85 @@ import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 
-class Filter<T>
+import haxe.Serializer;
+import haxe.Unserializer;
+import haxium.protocol.session.SessionSpec;
+
+import haxium.Serializable;
+
+typedef DFilter = Filter<Dynamic>;
+typedef DFilters = Array<DFilter>;
+
+class Filter<T> implements Serializable
 {
-	public var filter:FilterType;
+	public var spec:SessionSpecType;
 	public var condition:FilterCondition;
 	public var value:T;
 
-	public function new(filter:FilterType, value:T, 
+	public static inline var ID = 0x001;
+
+	public function new(spec:SessionSpecType, value:T, 
 		?condition:FilterCondition)
 	{
-		this.filter = filter;
+		this.spec = spec;
 		this.condition = condition;
 		this.value = value;
 	}
 
+	public function getCode():Int
+	{
+		return ID;
+	}
+
 	public function serialize():Bytes
 	{
-		var output = new BytesOutput();
-		output.writeByte(Type.enumIndex(filter));
-		output.writeByte(Type.enumIndex(condition));
+		var raw = Serializer.run(value);
+		var datas = Bytes.ofString(raw);
 
-		var bytes = Bytes.ofString(value + "");
-		output.writeInt32(bytes.length);
-		output.write(bytes);
+		var output = new BytesOutput();
+		output.writeInt32(ID);
+		output.writeInt32(Type.enumIndex(spec));
+		output.writeInt32(Type.enumIndex(condition));
+		output.writeInt32(datas.length);
+		output.write(datas);
+
 		return output.getBytes();
 	}
 
-	public static function deserialize(bytes:BytesInput):Filter<Dynamic>
+	public static function unserialize(datas:BytesInput):DFilter
 	{
-		var filterType = Type.allEnums(FilterType)[bytes.readByte()];
-		var condition = Type.allEnums(FilterCondition)[bytes.readByte()];
-		var len = bytes.readInt32();
-		var value = bytes.read(len);
-		var result = new Filter<Dynamic>(filterType, 
-			value.toString(), condition);
+		var id = datas.readInt32();
+		if (id != ID)
+			throw "Invalid datas";
+
+		id = datas.readInt32();
+		var spec = Type.allEnums(SessionSpecType)[id];
+
+		id = datas.readInt32();
+		var condition = Type.allEnums(FilterCondition)[id];
+
+		var len = datas.readInt32();
+		var raw = datas.readString(len);
+
+		var result = Unserializer.run(raw);
 		return result;
+	}
+
+	public static function serializeArray(list:Array<DFilter>):Bytes
+	{
+		return null;	
+	}
+
+	public static function unserializeArray(input:BytesInput, 
+		?result:Array<DFilter>):Array<DFilter>
+	{
+		return [];
 	}
 
 	public function toString():String
 	{
-		return '[Filter ' + filter + " | " + condition + " | " + value + "]";
+		return '[Filter ' + spec + " | " + condition + " | " + value + "]";
 	}
-}
-
-enum FilterType
-{
-	ABSTRACT;
-	PACKAGE;
-	VERSION;
 }
 
 enum FilterCondition

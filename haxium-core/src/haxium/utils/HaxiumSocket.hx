@@ -2,6 +2,7 @@ package haxium.utils;
 
 import haxe.io.Bytes;
 
+import haxe.io.Output;
 import haxe.Serializer;
 import haxe.Unserializer;
 //import haxium.protocol.action.AbstractAction;
@@ -23,7 +24,7 @@ class HaxiumSocket
 {
 	public var opened:Signal0;
 	public var socket:Socket;
-
+	
 	public function new()
 	{
 		opened = new Signal0();
@@ -36,7 +37,7 @@ class HaxiumSocket
 			socket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurity_error);
 			socket.addEventListener(ProgressEvent.SOCKET_DATA, onSocket_datas);
 		#else
-				
+			
 		#end
 	}
 
@@ -47,7 +48,7 @@ class HaxiumSocket
 		#else
 			try {
 				socket.connect(new Host(host), port);
-				//socket.setBlocking(false);
+				socket.setBlocking(true);
 				whenConnected(null);
 			} 
 			catch (e:Dynamic)
@@ -65,7 +66,7 @@ class HaxiumSocket
 	static public function sendDatas(socket:Socket, datas:Bytes)
 	{
 		#if flash
-			socket.writeBytes(datas.getData(), 0, datas.length);
+			socket.writeBytes(datas.getData());
 			socket.flush();
 		#else
 			socket.output.writeBytes(datas, 0, datas.length);
@@ -91,17 +92,19 @@ class HaxiumSocket
 
 	function onSocket_datas(e:Dynamic)
 	{
-		trace("onSocket_datas ::: " + e);
-		//trace(socket.bytesAvailable);
-		//trace(socket.readUTFBytes(socket.bytesAvailable));
-
-		var len = socket.readMultiByte(socket.bytesAvailable, "");
-		trace("len ::: " + len);
-		//var data = socket.readUTFBytes(socket.bytesAvailable);
-		//parseDatas(data);
+		trace("onSocket_datas");
+		var ba = new flash.utils.ByteArray();
+		socket.readBytes(ba);
+		
+		onRawDatas(Bytes.ofData(ba));
 	}
 
 	#end
+
+	function onRawDatas(bytes:Bytes)
+	{
+		trace("onRawDatas");
+	}
 
 	/*
 	public function sendAction(action:AbstractAction<Dynamic>)

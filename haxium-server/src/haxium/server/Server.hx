@@ -3,55 +3,73 @@ package haxium.server;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
 
-import haxium.protocol.session.SessionProtocol;
-import haxium.server.Client;
+import haxe.Unserializer;
+import haxium.protocol.ClientSession;
+import haxium.protocol.Session;
 import haxium.server.Protocol;
 import haxium.server.Sessions;
+import haxium.protocol.RemoteProtocol;
 
+import neko.net.ServerLoop;
 import neko.net.ThreadServer;
+
+import sys.net.Host;
 
 import sys.net.Socket;
 
-class Server extends ThreadServer<Client, Dynamic>
+typedef Client =  {
+	var socket:Socket;
+	var contentLength:Int;
+}
+
+class Server extends ServerLoop<Client>
 {
-	var sessions:Sessions;
+	public var sessions:Sessions;
 
 	public function new()
 	{
-		super();
+		super(function(socket) {
+			return {
+				contentLength:-1, socket:socket
+			};
+		});
+
 		sessions = new Sessions();
+	
+		Sys.println("\n");
+		Sys.println("db   db  .d8b.  db    db d888888b db    db .88b  d88. ");
+		Sys.println("88   88 d8' `8b `8b  d8'   `88'   88    88 88'YbdP`88 ");
+		Sys.println("88ooo88 88ooo88  `8bd8'     88    88    88 88  88  88 ");
+		Sys.println("88~~~88 88~~~88  .dPYb.     88    88    88 88  88  88 ");
+		Sys.println("88   88 88   88 .8P  Y8.   .88.   88b  d88 88  88  88 ");
+		Sys.println("YP   YP YP   YP YP    YP Y888888P ~Y8888P' YP  YP  YP ");
+		Sys.println("---------------------------------------- [Server] --- ");
+		Sys.println("\n");
 	}
 
-	override function clientConnected(s : Socket):Client
+	public function connect(host:String, port:Int)
 	{
-		return new Client(s);
+		run(new Host(host), port);
 	}
 
-	override function readClientMessage(client:Client, buf:Bytes, 
-		pos:Int, len:Int)
+	override function processClientData(client:Client, buf:Bytes, 
+		pos:Int, len:Int):Int
 	{
-		var bytes = buf.sub(pos, len);
-		var input = new BytesInput(bytes);
-		var type = input.readInt32();
-		input.position = 0;
-
-		var sessionAction:SessionAction;
-		switch (type)
+		var request = RemoteProtocol.readObject(client.socket.input);
+		trace("request === " + request.action);
+		/*
+		var session:ClientSession;
+		switch (request.action)
 		{
-			case SessionProtocol.CREATE 
-				| SessionProtocol.JOIN
-				| SessionProtocol.LIST 
-				| SessionProtocol.GET 
-				| SessionProtocol.CLOSE:
-				sessionAction = SessionAction.deserialize(bytes);
-				sessions.execute(client, sessionAction);
+			case RemoteProtocol.CREATE:
+				session = sessions.create(request.datas.specs, client.socket);
+				RemoteProtocol.created(client.socket, session);
+
+			case RemoteProtocol.HOOK:
+				var hook = sessions.hook(request.datas.body);
+				RemoteProtocol.hook(client.socket, hook);
 		}
-
-		return null;
-	}
-
-	override function clientDisconnected(c:Client)
-	{
-
+		*/
+		return len;
 	}
 }

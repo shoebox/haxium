@@ -20,8 +20,7 @@ class TestClient
 		];
 
 		var session = client.get(filters);
-
-
+		trace("session ::: " + session);
 
 		while(true){}
 

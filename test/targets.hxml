@@ -1,0 +1,44 @@
+## Flash 9+
+-main TestMain
+-lib munit
+-lib msignal
+-lib hamcrest
+-cp haxium-client/src
+-cp haxium-core/src
+-cp haxium-driver/src
+-cp haxium-server/src
+-cp src
+-cp test
+-swf-version 11
+-swf bin/as3_test.swf
+
+--next
+
+# Neko
+-main TestMain
+-lib munit
+-lib msignal
+-lib hamcrest
+-cp haxium-client/src
+-cp haxium-core/src
+-cp haxium-driver/src
+-cp haxium-server/src
+-cp src
+-cp test
+-neko bin/neko_test.n
+
+--next
+
+## CPP
+-main TestMain
+-lib munit
+-lib msignal
+-lib hamcrest
+-cp haxium-client/src
+-cp haxium-core/src
+-cp haxium-driver/src
+-cp haxium-server/src
+-cp src
+-cp test
+#-D HXCPP_M64
+-cpp bin/cpp_test
