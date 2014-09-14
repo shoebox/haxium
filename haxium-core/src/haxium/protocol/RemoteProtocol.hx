@@ -48,21 +48,62 @@ class RemoteProtocol
 		output(HOOK, socket, hook);
 	}
 
+	public static function createRequest(action:Int, 
+		datas:Dynamic):RemoteRequest<Dynamic>
+	{
+		var request = {action:action, datas:datas};
+		return request;
+	}
+
+	public static function serializeRequest(request:RemoteRequest<Dynamic>):Bytes
+	{
+		var bytes = getBytesOf(request);
+		return bytes;
+	}
+
+	public static function readRequest(bytes:Bytes):RemoteRequest<Dynamic>
+	{
+		var request = getFromBytes(bytes);
+		return request;
+	}
+
 	public static function output(action:Int, socket:ASocket, datas:Dynamic)
 	{
 		var request = {action:action, datas:datas};
-		var bytes = getBytesOf(request);
+		
+		var bytes = serializeRequest(request);
 
+		#if server
+		socket.output.writeBytes(bytes, 0, bytes.length);
+		#else
 		socket.send(bytes);
+		#end
+	}
+
+	public static function getFromInput<T>(input:Input):RemoteRequest<T>
+	{
+		var length = Std.int(input.readFloat());
+		
+		var stringBytes = input.readString(length);
+		var raw = stringBytes.toString();
+		
+		var result = Unserializer.run(raw);
+		result.length = length;
+		return result;
 	}
  
 	public static function getFromBytes<T>(bytes:Bytes):RemoteRequest<T>
 	{
 		var length = Std.int(bytes.getFloat(0));
+	
+		if (length > bytes.length)
+			return null;
+
 		var stringBytes = bytes.sub(8, length);
 		var raw = stringBytes.toString();
-
+		
 		var result = Unserializer.run(raw);
+		result.length = length + 8;
 		return result;
 	}	
 
@@ -85,4 +126,5 @@ typedef RemoteRequest<T>=
 {
 	public var datas:T;
 	public var action:Int;
+	@:optional public var length:Null<Int>;
 }

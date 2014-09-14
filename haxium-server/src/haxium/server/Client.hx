@@ -2,6 +2,7 @@ package haxium.server;
 
 import haxe.crypto.Md5;
 import sys.net.Socket;
+import haxium.utils.HaxiumUtil;
 
 class Client
 {
@@ -13,8 +14,7 @@ class Client
 	{
 		this.socket = socket;
 		this.expiry = Date.now();
-		this.id = Md5.encode(expiry.toString());
-
-		trace("New client ::: " + this.id);
+		this.id = HaxiumUtil.ID(socket.peer().host.toString());
+		socket.setBlocking(false);
 	}
 }

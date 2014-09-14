@@ -6,10 +6,30 @@ class HaxiumUtil
 {
 	static var SALT = 100;
 
-	public static function ID():String
+	public static inline var RESET   = 0;
+	public static inline var BLACK   = 30;
+	public static inline var RED     = 31;
+	public static inline var GREEN   = 32;
+	public static inline var YELLOW  = 33;
+	public static inline var BLUE    = 34;
+	public static inline var MAGENTA = 35;
+	public static inline var CYAN    = 36;
+	public static inline var WHITE   = 37;
+
+	public static function ID(?pepper:String = ""):String
 	{
 		var date = Date.now();
-		return Md5.encode(date.toString() + SALT++);
+		return Md5.encode(date.toString() + SALT++ + pepper);
+	}
+
+	public static function println(data:String, ?col:Int = BLUE)
+	{
+		Sys.println('\033[${col}m$data\033[0m');
+	}
+
+	public static function print(data:String, ?col:Int = BLUE)
+	{
+		Sys.print('\033[${col}m$data\033[0m');
 	}
 
 	public static function compareVersion(version1:String, version2:String):Int

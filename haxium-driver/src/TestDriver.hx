@@ -1,5 +1,7 @@
 package;
 
+import haxium.protocol.RemoteProtocol;
+
 import haxium.driver.Driver;
 import haxium.protocol.session.SessionSpec;
 
@@ -9,18 +11,20 @@ class TestDriver
 
 	static public function main()
 	{
-		trace("main");
 		driver = new Driver();
 		driver.opened.addOnce(connectionOpened);
 		driver.connect("localhost", 1234);
 		
 
-		while(true){}
+		while (true)
+		{
+			var bytes = driver.socket.input.readAll();
+			trace(RemoteProtocol.getFromBytes(bytes));
+		}
 	}
 
 	static function connectionOpened()
 	{
-		trace("connectionOpened");
 		var specs = new SessionSpec();
 		specs.add(PACKAGE, "org.shoebox.haxium");
 		specs.add(VERSION, "1.0.0");
