@@ -18,13 +18,13 @@ import neko.net.ThreadServer;
 import sys.net.Host;
 import sys.net.Socket;
 
-class Server extends ServerLoop<Client>
+class Server extends ThreadServer<Client, RemoteRequest<Dynamic>>
 {
 	public var sessions:Sessions;
 
 	public function new()
 	{
-		super(createClient);
+		super();
 
 		sessions = new Sessions();
 		HaxiumUtil.println('');
@@ -40,6 +40,18 @@ class Server extends ServerLoop<Client>
 		HaxiumUtil.println('');
 	}
 
+	override function clientConnected(socket:Socket) : Client
+	{
+		var client = new Client(socket);
+		trace("clientConnected ::: " + client.id);
+		return client;
+	}
+
+	override function clientDisconnected( c : Client )
+  	{
+    	Sys.println("client " + Std.string(c.id) + " disconnected");
+	}
+
 	function createClient(socket:Socket):Client
 	{
 		var client = new Client(socket);
@@ -48,16 +60,23 @@ class Server extends ServerLoop<Client>
 
 	public function connect(host:String, port:Int)
 	{
-		run(new Host(host), port);
+		run(host, port);
 	}
 
-	override function processClientData(client:Client, bytes:Bytes, 
-		position:Int, length:Int):Int
+	override function readClientMessage(client:Client, bytes:Bytes, 
+		position:Int, length:Int)
 	{
 		var request = RemoteProtocol.getFromBytes(bytes);
 		if (request == null)
-			return 0;
+			return null;
 
+		return {msg: request, bytes: request.length};
+	}
+
+	override function clientMessage(client:Client, 
+		request:RemoteRequest<Dynamic>)
+	{
+		Sys.println(client.id + " sent: " + request.length);
 		var session:ClientSession;
 		switch (request.action)
 		{
@@ -65,14 +84,12 @@ class Server extends ServerLoop<Client>
 				HaxiumUtil.println('<< Create session for ${client.id}');
 				session = sessions.create(request.datas.specs, client.socket);
 
-				HaxiumUtil.println('>> Session created session ${session.id}', 
+				HaxiumUtil.println('>> Session created session ${session}', 
 					HaxiumUtil.YELLOW);
 				
 				RemoteProtocol.created(client.socket, session);
 
 			default:
 		}
-
-		return request.length;
 	}
 }

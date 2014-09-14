@@ -67,10 +67,8 @@ class HaxiumSocket
 	{
 		#if flash
 			socket.writeBytes(datas.getData());
-			socket.flush();
 		#else
 			socket.output.writeBytes(datas, 0, datas.length);
-			socket.output.flush();
 		#end
 	}
 
@@ -92,7 +90,6 @@ class HaxiumSocket
 
 	function onSocket_datas(e:Dynamic)
 	{
-		trace("onSocket_datas");
 		var ba = new flash.utils.ByteArray();
 		socket.readBytes(ba);
 		
@@ -124,6 +121,7 @@ class HaxiumSocket
 
 	function whenConnected(_)
 	{
+		trace("whenConnected");
 		opened.dispatch();
 	}
 	

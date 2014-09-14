@@ -24,12 +24,20 @@ class HaxiumUtil
 
 	public static function println(data:String, ?col:Int = BLUE)
 	{
+		#if flash
+		trace(data);
+		#else
 		Sys.println('\033[${col}m$data\033[0m');
+		#end
 	}
 
 	public static function print(data:String, ?col:Int = BLUE)
 	{
+		#if flash
+		trace(data);
+		#else
 		Sys.print('\033[${col}m$data\033[0m');
+		#end
 	}
 
 	public static function compareVersion(version1:String, version2:String):Int

@@ -70,7 +70,6 @@ class RemoteProtocol
 	public static function output(action:Int, socket:ASocket, datas:Dynamic)
 	{
 		var request = {action:action, datas:datas};
-		
 		var bytes = serializeRequest(request);
 
 		#if server
@@ -95,7 +94,6 @@ class RemoteProtocol
 	public static function getFromBytes<T>(bytes:Bytes):RemoteRequest<T>
 	{
 		var length = Std.int(bytes.getFloat(0));
-	
 		if (length > bytes.length)
 			return null;
 

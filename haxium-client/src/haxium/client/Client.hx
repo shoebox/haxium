@@ -1,6 +1,7 @@
 package haxium.client;
 
 import haxium.protocol.filter.Filter;
+import haxium.protocol.RemoteProtocol;
 import haxium.protocol.Session;
 import haxium.utils.HaxiumSocket;
 
