@@ -1,0 +1,10 @@
+-cp src
+-cp ../haxium-core/src
+-main TestDriver
+# -swf-version 11
+# -swf bin/main.swf
+# -swf-header 800:600:32:CCCCCC
+-lib msignal
+-D driver
+ -cpp bin
+-debug

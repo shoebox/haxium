@@ -1,0 +1,6 @@
+-neko server.n 
+-cp src
+-D server
+-main TestServer
+-lib msignal
+-cp ../haxium-core/src
