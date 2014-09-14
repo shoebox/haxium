@@ -1,0 +1,6 @@
+-cp src
+-cp ../haxium-core/src
+-main TestClient
+-lib msignal
+-cpp bin
+-debug
