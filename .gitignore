@@ -1,0 +1,24 @@
+bin
+Export
+.temp
+lib
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+/haxium.sublime-workspace
+/haxium.sublime-project
+*.hxproj
+node_modules
+
+/.idea/
+
+*.iml
+
+#iOS
+*.a
+*.ipa
+*.so
+*.DSYM
+*.DSYM.zip
