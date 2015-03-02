@@ -10,7 +10,7 @@ class MonkeyDevice
 	public var activityName(default, default):String = "MainActivity";
 	public var appPackage(default, default):String = "org.shoebox.haxium";
 
-	public var server:Server;
+	public var server(default, null):Server;
 
 	public function new(thread:MonkeyThread)
 	{
@@ -20,7 +20,7 @@ class MonkeyDevice
 
 	public function run()
 	{
-		server = new Server(8080);
 		thread.sendMessage('device.startActivity("$appPackage/$appPackage.$activityName")');
+		server = new Server(8080);
 	}
 }

@@ -1,6 +1,6 @@
 package monkey;
 
-import haxium.Protocol;
+import haxium.protocol.Protocol;
 import monkey.MonkeyDevice;
 import monkey.MonkeyThread;
 import msignal.Signal;
@@ -20,7 +20,6 @@ class MonkeyRunner
 	{
 		monkey = new MonkeyThread();
 		imports();
-		waitForConnection();
 	}
 
 	public function imports()

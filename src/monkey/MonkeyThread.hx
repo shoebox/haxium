@@ -1,7 +1,11 @@
 package monkey;
 
 import haxe.io.Bytes;
+#if neko
 import neko.vm.Thread;
+#elseif cpp
+import cpp.vm.Thread;
+#end
 import sys.io.Process;
 import msignal.Signal;
 

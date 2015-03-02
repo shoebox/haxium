@@ -2,11 +2,14 @@
 <project>
 	
 	<meta title="Test" package="org.shoebox.haxium" version="1.0.0" company="Company Name" />
-	<app main="Main" path="Export" file="Test" />
+	<app main="MainTest" path="Export" file="Test" />
 	
 	<source path="Source" />
+	<source path="../src" />
 	
+	<haxelib name="msignal" />
 	<haxelib name="openfl" />
+	<haxedef name="-Dno_console" />
 	
 	<assets path="Assets" rename="assets" exclude="openfl.svg" />
 	<icon path="Assets/openfl.svg" />

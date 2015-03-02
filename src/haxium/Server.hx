@@ -1,19 +1,38 @@
 package haxium;
 
+import haxium.protocol.Command;
+import haxium.protocol.Protocol;
 import sys.net.Host;
 import sys.net.Socket;
+#if neko
 import neko.vm.Thread;
+#elseif cpp
+import cpp.vm.Thread;
+#end
 
 class Server
 {
 	public var port(default, null):Int;
+	public var input(default, null):Protocol;
+	public var output(default, null):Protocol;
+	public var remote(default, null):Socket;
 
-	var listenSocket:Socket;
-
+	public var listenSocket:Socket;
+	
 	public function new(port:Int)
 	{
 		this.port = port;
-		Thread.create(waitForConnection);
+		waitForConnection();
+	}
+
+	public function readCommand():Command
+	{
+		return Protocol.readCommand(remote.input);
+	}
+
+	public function writeCommand(command:Command)
+	{
+		return Protocol.writeCommand(remote.output, command);
 	}
 
 	function waitForConnection()
@@ -25,7 +44,7 @@ class Server
 			{
 				var host = new Host("192.168.1.101");
 				listenSocket.bind(host, port);
-				listenSocket.listen(1);
+				listenSocket.listen(10);
 			}
 			catch (e:Dynamic)
 			{
@@ -58,6 +77,8 @@ class Server
 			}
 			var peer = socket.peer();
 			Sys.println('\033[35m ' + "\nReceived connection from " + peer.host + ".");
+			remote = socket;
+			break;
 		}
 	}
 }
