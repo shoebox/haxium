@@ -2,6 +2,7 @@ package haxium;
 
 import haxium.protocol.Command;
 import haxium.protocol.Protocol;
+import haxium.util.Log;
 import sys.net.Host;
 import sys.net.Socket;
 #if neko
@@ -9,6 +10,7 @@ import neko.vm.Thread;
 #elseif cpp
 import cpp.vm.Thread;
 #end
+
 
 class Server
 {
@@ -42,15 +44,16 @@ class Server
 			listenSocket = new Socket();
 			try
 			{
-				var host = new Host("192.168.1.101");
+				var host = new Host(Host.localhost());
+				Sys.println(host);
 				listenSocket.bind(host, port);
 				listenSocket.listen(10);
 			}
 			catch (e:Dynamic)
 			{
-				Sys.println('\033[35m ' + "Failed to bind/listen on port " + 
-                            port + ": " + e);
-                Sys.println('\033[35m ' + "Trying again in 3 seconds.");
+				Log.trace("Failed to bind/listen on port " + 
+                            port + ": " + e, Cyan);
+                Log.trace("Trying again in 3 seconds.", Cyan);
                 Sys.sleep(3);
                 listenSocket.close();
                 listenSocket = null;
@@ -64,19 +67,19 @@ class Server
 			{
 				try
 				{
-					Sys.println('\033[35m ' + "Listening for Haxe client connection ...");
+					Log.trace("Listening for Haxe client connection ...", Cyan);
 					socket = listenSocket.accept();
 				}
 				catch (e : Dynamic)
 				{
-					Sys.println('\033[35m ' + "Failed to accept connection on port " +
-					port + ": " + e);
-					Sys.println('\033[35m ' + "Trying again in 1 second.");
+					Log.trace("Failed to accept connection on port " 
+						+ port + ": " + e, Cyan);
+					Log.trace("Trying again in 1 second.", Cyan);
 					Sys.sleep(5);
 				}
 			}
 			var peer = socket.peer();
-			Sys.println('\033[35m ' + "\nReceived connection from " + peer.host + ".");
+			Log.trace("Received connection from " + peer.host + ".", Cyan);
 			remote = socket;
 			break;
 		}

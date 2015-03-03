@@ -8,8 +8,8 @@ import msignal.Signal;
 class MonkeyRunner
 {
 	public var monkey(default, null):MonkeyThread;
-	public var device(default, null):MonkeyDevice;
-	public var deviceConnected(default, null):Signal1<MonkeyDevice> = new Signal1();
+	public var device(default, default):MonkeyDevice;
+	public var deviceConnected(default, default):MonkeyDevice->Void;
 
 	public static inline var Imports = "from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice";
 	public static inline var WaitForConnection = "device = MonkeyRunner.waitForConnection()";
@@ -31,9 +31,14 @@ class MonkeyRunner
 	{
 		monkey.sendMessage(WaitForConnection);
 		monkey.sendMessage(PrintDevice);
-		var device = monkey.waitForAnswer();
-		var monkeyDevice = new MonkeyDevice(monkey);
-		if (ERegDevice.match(device)) deviceConnected.dispatch(monkeyDevice);
+		var answer = monkey.waitForAnswer();
+		if (ERegDevice.match(answer))
+		{
+			var result = new MonkeyDevice(monkey);
+			if (deviceConnected != null) deviceConnected(result);
+			device = result;
+		} 
+		
 	}
 
 	public function alert(message:String, title:String, okTitle:String)
