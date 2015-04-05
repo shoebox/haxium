@@ -1,6 +1,7 @@
 package monkey;
 
 import haxium.protocol.Element;
+import haxium.protocol.Elements;
 import monkey.MonkeyRunner;
 import haxium.Server;
 import monkey.MonkeyThread;
@@ -9,18 +10,29 @@ class MonkeyDevice
 {
 	public var activityName(default, default):String = "MainActivity";
 	public var appPackage(default, default):String = "org.shoebox.haxium";
+	public var elements(default, null):Elements;
 	public var server(default, null):Server;
 	public var thread(default, null):MonkeyThread;
 
-	public function new(thread:MonkeyThread)
+	public function new(thread:Null<MonkeyThread>)
 	{
 		this.thread = thread;
 	}
 
+	#if android
+
 	public function startActivity()
 	{
 		thread.sendMessage('device.startActivity("$appPackage/$appPackage.$activityName")');
+		listen();
+	}
+
+	#end
+
+	public function listen()
+	{
 		server = new Server(8080);
+		elements = new Elements(server, this);
 	}
 
 	public function getElement(id:String):Element
@@ -32,7 +44,9 @@ class MonkeyDevice
 	public function touch(x:Int, y:Int, ?type:String)
 	{
 		type = type == null ? TouchType.Down : type;
+		#if android
 		thread.sendMessage('device.touch($x, $y, $type)');
+		#end
 	}
 }
 

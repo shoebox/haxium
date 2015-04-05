@@ -8,24 +8,88 @@ import haxium.protocol.ElementCommand;
 import openfl.Lib;
 import openfl.display.DisplayObject;
 import openfl.display.DisplayObjectContainer;
+import openfl.events.MouseEvent;
+import openfl.geom.Point;
 #end
 
 class OpenFlHander implements IHandler
 {
 	public function new()
 	{
-
+		
 	}
 
 	public function onMessage(message:Command):HandlerResponse
 	{
-		trace("onMessage ::: " + message);
 		var result:HandlerResponse = null;
 		result = switch (message)
 		{
-			case Element(action, id) : elementCommand(action, id);
+			case Command.Click(stageX, stageY) : click(stageX, stageY);
+			case Command.Element(action, id) : elementCommand(action, id);
+			case Command.Elements(list) : elementsList();
+			case Command.ElementsByType(name) : elementsList(name);
 			default : null;
 		}
+		return result;
+	}
+
+	function click(stageX:Int, stageY:Int):HandlerResponse
+	{
+		var event:MouseEvent = new MouseEvent(MouseEvent.CLICK);
+		event.stageX = stageX;
+		event.stageY = stageY;
+		
+		var stage = openfl.Lib.current;
+		var point = new Point(stageX, stageY);
+		var childs = stage.getObjectsUnderPoint(point);
+		for (child in childs)
+			child.dispatchEvent(event);
+
+		event.target = stage;
+
+		var response:HandlerResponse = 
+		{
+			handled : true,
+			command : null
+		}
+		return response;
+	}
+
+	function elementsList(?name:String):HandlerResponse
+	{
+		var result = childs(Lib.current.stage, [], name);
+		var response:HandlerResponse = 
+		{
+			handled : true,
+			command : Command.Elements(result)
+		}
+
+		return response;
+	}
+
+	function childs(container:DisplayObjectContainer, result:Array<String>,
+		?type:String)
+	{
+		var count = container.numChildren;
+		var child:DisplayObject;
+		var childTypeName:String;
+		var i = 0;
+		while (i < count)
+		{
+			child = container.getChildAt(i);
+			childTypeName = Type.getClassName(Type.getClass(child));
+			if(childTypeName == type)
+			{
+				result.push(child.name);
+			}
+			
+			if (Std.is(child, DisplayObjectContainer))
+			{
+				result = childs(cast child, result, type);
+			}
+			i ++;
+		}
+
 		return result;
 	}
 

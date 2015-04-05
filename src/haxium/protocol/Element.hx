@@ -25,7 +25,13 @@ class Element
 		var remoteBounds = bounds;
 		var x = Std.int(remoteBounds.position.x + remoteBounds.width / 2);
 		var y = Std.int(remoteBounds.position.y + remoteBounds.height / 2);
-		device.touch(x, y);
+
+		#if android
+			device.touch(x, y);
+		#else
+			var command = Command.Click(x, y);
+			server.writeCommand(command);
+		#end
 	}
 
 	function get_bounds():ElementBounds

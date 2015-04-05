@@ -55,7 +55,6 @@ class Client
 
 	function whenConnected()
 	{
-		trace("whenConnected");
 		connected = true;
 		handler.listen();
 	}
