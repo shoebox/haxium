@@ -34,9 +34,9 @@ class MonkeyRunner
 		var answer = monkey.waitForAnswer();
 		if (ERegDevice.match(answer))
 		{
-			var result = new MonkeyDevice(monkey);
-			if (deviceConnected != null) deviceConnected(result);
-			device = result;
+			// var result = new MonkeyDevice(monkey);
+			// if (deviceConnected != null) deviceConnected(result);
+			// device = result;
 		} 
 		
 	}

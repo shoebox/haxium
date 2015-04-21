@@ -1,58 +1,69 @@
 package monkey;
 
+import haxium.protocol.By;
+import haxium.protocol.Command;
+import haxium.protocol.DeviceCommand;
 import haxium.protocol.Element;
 import haxium.protocol.Elements;
 import monkey.MonkeyRunner;
 import haxium.Server;
 import monkey.MonkeyThread;
 
+import neko.vm.Thread;
+import sys.net.Socket;
+
 class MonkeyDevice
 {
-	public var activityName(default, default):String = "MainActivity";
-	public var appPackage(default, default):String = "org.shoebox.haxium";
+/*
+	public var socket(default, null):Socket;
 	public var elements(default, null):Elements;
 	public var server(default, null):Server;
-	public var thread(default, null):MonkeyThread;
 
-	public function new(thread:Null<MonkeyThread>)
+	public function new(server:Server, socket:Socket)
 	{
-		this.thread = thread;
+		// this.server = server;
+		// this.socket = socket;
+		// this.elements = new Elements(server, this);
+		// runTests();
 	}
 
-	#if android
-
-	public function startActivity()
+	public function runTests()
 	{
-		thread.sendMessage('device.startActivity("$appPackage/$appPackage.$activityName")');
-		listen();
+		Sys.sleep(5);
+
+		var filter = By.ElementType("mui.input.TextInput");
+		var inputs = elements.get(filter);
+		var element:Element = inputs[0];
+		trace(element.id);
+		trace(element.bounds);
+		element.setProperty("data", "hello johann");
+
+		filter = By.ElementType("store.companion.view.component.LabelledButton");
+		inputs = elements.get(filter);
+		element = inputs[0];
+		element.click();
 	}
 
-	#end
-
-	public function listen()
+	public function touch(stageX:Int, stageY:Int)
 	{
-		server = new Server(8080);
-		elements = new Elements(server, this);
+		var deviceCommand = DeviceCommand.Click(stageX, stageY);
+		var command = Command.Device(deviceCommand);
+		server.writeCommand(command);
 	}
 
-	public function getElement(id:String):Element
+	public static function create(server:Server, socket:Socket)
 	{
-		var result = new Element(id, server, this);
-		return result;
+		var thread = Thread.create(build);
+		thread.sendMessage(server);
+		thread.sendMessage(socket);
 	}
 
-	public function touch(x:Int, y:Int, ?type:String)
+	static function build()
 	{
-		type = type == null ? TouchType.Down : type;
-		#if android
-		thread.sendMessage('device.touch($x, $y, $type)');
-		#end
+		var server:Server = Thread.readMessage(true);
+		var socket:Socket = Thread.readMessage(true);
+		var device = new MonkeyDevice(server, socket);
 	}
+	*/
 }
 
-class TouchType
-{
-	public static inline var Down = "'DOWN'";
-	public static inline var DownAndUp = "'DOWN_AND_UP'";
-	public static inline var Up = "'UP'";
-}

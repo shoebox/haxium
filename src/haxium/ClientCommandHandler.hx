@@ -29,7 +29,7 @@ class ClientCommandHandler
 
 	public function listen()
 	{
-		timer = new Timer(100);
+		timer = new Timer(1);
 		timer.run = checkForMessage;
 
 		thread = Thread.create(threadedListener);
@@ -43,22 +43,18 @@ class ClientCommandHandler
 		if (message != null)
 		{
 			var handled:Bool = false;
-			var result:HandlerResponse;
+			var result:Dynamic;
 			for (handler in handlers)
 			{
 				result = handler.onMessage(message);
-				if (result.handled)
+				if (result != null)
 				{
-					if (result.command != null)
-					{
-						Protocol.writeDynamic(client.socket.output, result.command);	
-					}
+					Protocol.writeDynamic(client.socket.output, result);
 					handled = true;
 					break;
 				}
 			}
-
-			if (!handled) Log.trace("Unhandled message $message", Red);
+			if (!handled) Log.trace('Unhandled message $message', Red);
 		}
 	}
 
@@ -71,7 +67,7 @@ class ClientCommandHandler
 		{
 			var command:Command = Protocol.readCommand(input);
 			if (command != null) mainThread.sendMessage(command);
-			Sys.sleep(2);
+			Sys.sleep(0.5);
 		}
 	}
 

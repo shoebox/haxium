@@ -4,9 +4,11 @@ enum ElementCommand
 {
 	Clear;
 	Click;
-	GetBounds(?bounds:ElementBounds);
+	GetBounds;
 	GetText;
 	SetText(?text:String);
+	GetProperty(property:String);
+	SetProperty(property:String, value:Dynamic);
 }
 
 typedef ElementBounds=

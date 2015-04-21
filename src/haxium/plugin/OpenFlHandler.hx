@@ -78,7 +78,7 @@ class OpenFlHander implements IHandler
 		{
 			child = container.getChildAt(i);
 			childTypeName = Type.getClassName(Type.getClass(child));
-			if(childTypeName == type)
+			if (type == null || childTypeName == type)
 			{
 				result.push(child.name);
 			}

@@ -51,13 +51,13 @@ class MainTest extends Sprite{
 			{
 				trace("client");
 
-				var host:String = Host.localhost();
+				var host:String = sys.net.Host.localhost();
 				#if mobile
 				host = "192.168.1.64";
 				#end
 
-				var client = new Client(host, 8080);
-				client.addHandler(new OpenFlHander());
+				var client = new haxium.Client(host, 8080);
+				client.addHandler(new haxium.plugin.OpenFlHandler.OpenFlHander());
 				client.connect();
 			}, 500
 		);
