@@ -10,20 +10,17 @@ import haxium.Device;
 class Elements
 {
 	public var device(default, null):Device;
-	public var server(default, null):Server;
-
-	public function new(server:Server, device:Device)
+	
+	public function new(device:Device)
 	{
-		this.server = server;
 		this.device = device;
 	}
 
 	public function get(?filter:By):Array<Element>
 	{
-		var result:Array<Element> = [];
 		var command = Command.Elements(filter);
-		server.writeCommand(command);
-		var commandResult = server.readCommand();
+		device.server.writeCommand(command);
+		var commandResult = device.server.readCommand();
 		
 		var element:Element;
 		var result:Array<Element> = [];
@@ -32,7 +29,7 @@ class Elements
 			case ElementsResult(list):
 				for (id in list)
 				{
-					element = new Element(id, server, device);
+					element = new Element(id, device.server, device);
 					result.push(element);
 				}
 

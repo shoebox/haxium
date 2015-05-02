@@ -1,4 +1,4 @@
-package monkey;
+package android.monkey;
 
 import haxe.io.Bytes;
 #if neko
@@ -8,6 +8,7 @@ import cpp.vm.Thread;
 #end
 import sys.io.Process;
 import msignal.Signal;
+import haxium.util.Log;
 
 typedef PrintStream =
 {
@@ -21,6 +22,8 @@ class MonkeyThread
 
 	public static inline var Path = "/Users/johann.martinache/Desktop/android/sdk/tools/./monkeyrunner";
 
+	static inline var MonkeyTag = '[MonkeyRunner] ';
+
 	public function new()
 	{
 		process = new Process(Path, []);
@@ -30,7 +33,7 @@ class MonkeyThread
 			while (true)
 			{
 				var error = process.stderr.readLine();
-				if (error != "") Sys.println('\033[31m ' + error);
+				if (error != "") Log.trace('$MonkeyTag' + error, Red);
 			}
 		});
 		thread.sendMessage(process);
@@ -42,7 +45,7 @@ class MonkeyThread
 		while (true)
 		{
 			result = process.stdout.readLine();
-			Sys.println("\033[33m" + result);
+			Log.trace('$MonkeyTag' + result, Blue);
 			if (result != null) break;
 		}
 		return result;
@@ -50,7 +53,7 @@ class MonkeyThread
 
 	public function sendMessage(message:String)
 	{
-		Sys.println("\033[32m" + message);
+		Log.trace('$MonkeyTag' + message, Blue);
 		process.stdin.writeString(message + "\n");	
 		var result = waitForAnswer();
 		if (result != '>>> $message') throw "Error while sending message";

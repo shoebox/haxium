@@ -1,5 +1,7 @@
 package haxium;
 
+import android.monkey.MonkeyDevice;
+import android.monkey.MonkeyRunner;
 import haxium.Device;
 import haxium.protocol.Command;
 import haxium.protocol.Protocol;
@@ -19,7 +21,7 @@ class Server
 	public var input(default, null):Protocol;
 	public var output(default, null):Protocol;
 	public var remote(default, null):Socket;
-
+	
 	public var listenSocket:Socket;
 	
 	public function new(port:Int)
@@ -42,9 +44,15 @@ class Server
 		return Protocol.writeCommand(remote.output, command);
 	}
 
+	public function listenForMonkey(whenMonkeyConnected:MonkeyDevice->Void)
+	{
+		MonkeyRunner.create(whenMonkeyConnected);
+	}
+
 	public function listen(whenConnected:Device->Void)
 	{
 		Log.trace("Listening for Haxe client connection ...", Cyan);
+
 		while (true)
 		{
 			var socket = waitForConnection();

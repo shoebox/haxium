@@ -11,12 +11,14 @@ class Device
 	public var socket(default, null):Socket;
 	public var server(default, null):Server;
 	public var elements(default, null):Elements;
+	public var session(default, null):Session;
 
 	function new(server:Server, socket:Socket)
 	{
 		this.server = server;
 		this.socket = socket;
-		this.elements = new Elements(server, this);
+		this.elements = new Elements(this);
+		this.session = new Session(this);
 	}
 
 	public function touch(stageX:Int, stageY:Int)

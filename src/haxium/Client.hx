@@ -13,7 +13,7 @@ class Client
 	public var connected(default, null):Bool;
 	public var socket(default, null):Socket;
 	public var handler(default, null):ClientCommandHandler;
-
+	
 	var protocol:Protocol;
 
 	public function new(host:String, port:Int)
@@ -27,6 +27,7 @@ class Client
 	public function connect()
 	{
 		var serverHost = new Host(host);
+		var tryCount = 0;
 		while (!connected)
 		{
 			try
@@ -43,7 +44,10 @@ class Client
 				trace("Failed to connect to debugging server at " +
 					host + ":" + port + " : " + error);
 			}
-			Sys.println("Trying again in 10 seconds.");
+			Sys.println("Trying again in 2 seconds.");
+			tryCount++;
+			if (tryCount > 3) break;
+
 			Sys.sleep(10);
 		}
 	}

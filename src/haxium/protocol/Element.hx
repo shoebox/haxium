@@ -3,6 +3,7 @@ package haxium.protocol;
 import haxium.protocol.Command;
 import haxium.protocol.ElementCommand;
 import haxium.protocol.ElementCommand.ElementBounds;
+import haxium.protocol.Property;
 import haxium.Server;
 import haxium.Device;
 
@@ -18,6 +19,11 @@ class Element
 		this.device = device;
 		this.id = id;
 		this.server = server;
+	}
+
+	public function toString():String
+	{
+		return "Element ::: " + id;
 	}
 
 	public function click()
@@ -36,7 +42,17 @@ class Element
 
 	public function getProperty(property:String):Dynamic
 	{
-		var result = runElementAction(GetProperty(property));	
+		var property:Property = runElementAction(GetProperty(property));
+		var result:Dynamic = null;
+		if (property.type == PropertyType.Element)
+		{
+			result = new Element(property.value, server, device);
+		}
+		else
+		{
+			result = property.value;
+		}
+
 		return result;
 	}
 

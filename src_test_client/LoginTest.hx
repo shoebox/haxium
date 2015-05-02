@@ -29,9 +29,11 @@ class LoginTest
 	{
 
 	}
-	
+
+
 	@Test public function test1GetFields()
 	{
+		Sys.sleep(20);
 		var filter = By.ElementType("mui.input.TextInput");
 		var inputs:Array<Element> = Main.currentDevice.elements.get(filter);
 		Assert.areEqual(inputs.length, 2);
@@ -103,10 +105,43 @@ class LoginTest
 		elementInput2.setProperty("data", "123456");
 		button.click();
 		
-		Sys.sleep(5);
+		Sys.sleep(10);
 
 		var errorText = feedback.getProperty("errorText");			
 		var invalidPassword = "Invalid credentials";
 		Assert.areEqual(invalidPassword, errorText);
+	}
+	
+	@Test public function test7Help()
+	{
+		var filter:By;
+		var elems:Array<Element>;
+
+		filter = By.ElementType("app.view.common.TouchDataButton");
+		elems = Main.currentDevice.elements.get(filter);
+		elems[0].click();
+
+		Sys.sleep(1);
+
+		filter = By.ElementType("store.companion.account.login.help.LoginHelpViewMobile");
+		elems = Main.currentDevice.elements.get(filter);
+		Assert.areEqual(1, elems.length);
+
+		filter = By.ElementType("store.companion.view.component.PanelLabelledButton");
+		elems = Main.currentDevice.elements.get(filter);
+		Sys.sleep(1);
+		elems[0].click();
+
+		filter = By.ElementType("store.companion.account.login.help.LoginHelpViewMobile");
+		elems = Main.currentDevice.elements.get(filter);
+		Assert.areEqual(1, elems.length);
+		Assert.areEqual(false, elems[0].getProperty("visible"));
+	}
+
+	@Test public function test8Login()
+	{
+		elementInput1.setProperty("data", "massivisionautomation@gmail.com");
+		elementInput2.setProperty("data", "osefosef");
+		button.click();
 	}
 }

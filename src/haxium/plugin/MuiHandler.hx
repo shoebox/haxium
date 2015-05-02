@@ -7,6 +7,8 @@ import haxium.protocol.By;
 import haxium.protocol.Command;
 import haxium.protocol.DeviceCommand;
 import haxium.protocol.ElementCommand;
+import haxium.protocol.Property;
+import haxium.protocol.SessionCommand;
 
 import mui.Lib;
 import mui.display.Display;
@@ -34,6 +36,7 @@ class MuiHandler implements IHandler
 			case Command.DeviceAction(command) : deviceCommand(command);
 			case Command.Elements(by) : elements(by);
 			case Command.ElementCommand(id, action) : elementCommand(id, action);
+			case Command.SessionAction(command) : sessionAction(command);
 			default : null;
 		}
 		return result;
@@ -59,6 +62,18 @@ class MuiHandler implements IHandler
 				height : child.height
 			};
 			default : null;
+		}
+		return result;
+	}
+
+	function sessionAction(command:SessionCommand):Dynamic
+	{
+		trace("sessionAction ::: " + command);
+		var result:Dynamic = null;
+		var root = mui.Lib.display;
+		switch (command)
+		{
+			case SessionCommand.GetUrl : 
 		}
 		return result;
 	}
@@ -97,16 +112,33 @@ class MuiHandler implements IHandler
 
 	function getProperty(child:Null<Display>, property:String):Dynamic
 	{
-		var result:Dynamic = null;
+		var result:Property = null;
+		var propertyType:PropertyType = Variable;
+		var value:Dynamic = null;
 		try
 		{
-			result = Reflect.getProperty(child, property);
+			value = Reflect.getProperty(child, property);
 		}
 		catch (exception:Dynamic)
 		{
 
 		}
+		
+		if (Std.is(value, Display))
+		{
+			propertyType = PropertyType.Element;
+			value = getChildAutomationName(value);
+		}
 
+		var result:Dynamic = null;
+
+		if (value != null)
+		{
+			result = {
+				type : propertyType,
+				value : value
+			};
+		}
 		return result;
 	}
 
@@ -148,13 +180,14 @@ class MuiHandler implements IHandler
 		return result;
 	}
 
-	function testChildAgainst(child:Display, ?by:By):Bool
+	function testChildAgainst(child:Display, ?by:Null<By>):Bool
 	{
-		var result = switch (by)
+		var result:Bool = switch (by)
 		{
 			case ElementId(id) : getChildAutomationName(child) == id;
 			case ElementType(name) : getClassName(child) == name;
-			default : true;
+			case null : true;
+			default : false;
 		}
 		return result;
 	}
@@ -174,16 +207,30 @@ class MuiHandler implements IHandler
 
 	function getChildAutomationName(child:Display):String
 	{
-		var result = getLastClassName(child);
-		var p = child.parent;
-		var id = child + "";
-		if (p != null) result = getLastClassName(p) + id + ":" + result;
-		var depth = 0;
-		try
+		var target = child;
+		var parent = child.parent;
+		var result = getLastClassName(child) + getIndex(parent);
+		if (parent != null)
 		{
-			depth = p != null ? p.getChildIndex(child) : child.rootX + child.rootY;
+			result = getLastClassName(child) + getIndex(parent) + " : " + result;
 		}
-		catch (e:Dynamic){}
-		return result + depth;
+
+		// var result = getLastClassName(child);
+		// var p = child.parent;
+		// var id = child;
+		// if (p != null) result = getLastClassName(p)+ "->" + result;
+		// var depth = 0;
+		// try
+		// {
+		// 	depth = p != null ? p.getChildIndex(child) : child.rootX + child.rootY;
+		// }
+		// catch (e:Dynamic){}
+		return result;
+	}
+
+	function getIndex(child:Display):Int
+	{
+		var index = child.index;
+		return index;
 	}
 }
