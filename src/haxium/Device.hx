@@ -1,7 +1,7 @@
 package haxium;
 
-import haxium.protocol.Command;
-import haxium.protocol.DeviceCommand.Click;
+import haxium.protocol.command.Command;
+import haxium.protocol.TouchType;
 import haxium.protocol.Elements;
 import neko.vm.Thread;
 import sys.net.Socket;
@@ -21,16 +21,8 @@ class Device
 		this.session = new Session(this);
 	}
 
-	public function touch(stageX:Int, stageY:Int)
-	{
-		var deviceCommand = Click(stageX, stageY);
-		var command = Command.DeviceAction(deviceCommand);
-		server.writeCommand(command);
-
-		var response = server.readCommand();
-	}
-
-	public static function create(server:Server, socket:Socket, whenConnected:Device->Void)
+	public static function create(server:Server, socket:Socket, 
+		whenConnected:Device->Void)
 	{
 		var thread = Thread.create(build);
 		thread.sendMessage(server);
@@ -45,5 +37,37 @@ class Device
 		var callback:Device->Void = Thread.readMessage(true);
 		var device = new Device(server, socket);
 		callback(device);
+	}
+
+	public function drag(startX:Int, startY:Int, endX:Int, endY:Int, 
+		duration:Float, steps:Int):Bool
+	{
+		var command = Command.Drag(startX, startY, endX, endY, duration, steps);
+		return runCommand(command);
+	}
+
+	public function press(x:Int, y:Int):Bool
+	{
+		var command = Command.Press(x, y);
+		return runCommand(command);
+	}
+
+	public function tap(x:Int, y:Int):Bool
+	{
+		var command = Command.Tap(x, y);
+		return runCommand(command);
+	}
+
+	public function touch(x:Int, y:Int, type:TouchType):Bool
+	{
+		var command = Command.Touch(x, y, type);
+		return runCommand(command);
+	}
+
+	function runCommand(command:Dynamic):Dynamic
+	{
+		server.writeCommand(command);
+		var response = server.readCommand();
+		return response;
 	}
 }

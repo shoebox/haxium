@@ -1,6 +1,6 @@
 package android.monkey;
 
-import haxium.protocol.Protocol;
+import haxium.protocol.Commander;
 import android.monkey.MonkeyDevice;
 import android.monkey.MonkeyThread;
 import msignal.Signal;

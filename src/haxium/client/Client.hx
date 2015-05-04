@@ -1,8 +1,8 @@
-package haxium;
+package haxium.client;
 
-import haxium.ClientCommandHandler;
-import haxium.protocol.Protocol;
-import haxium.plugin.IHandler;
+import haxium.client.ClientCommandHandler;
+import haxium.protocol.Commander;
+import haxium.handler.IHandler;
 import sys.net.Host;
 import sys.net.Socket;
 
@@ -14,7 +14,7 @@ class Client
 	public var socket(default, null):Socket;
 	public var handler(default, null):ClientCommandHandler;
 	
-	var protocol:Protocol;
+	var protocol:Commander;
 
 	public function new(host:String, port:Int)
 	{
@@ -52,13 +52,14 @@ class Client
 		}
 	}
 
-	public function addHandler(value:IHandler)
+	public function addHandler(value:IHandler<Dynamic>)
 	{
 		handler.addHandler(value);
 	}
 
 	function whenConnected()
 	{
+		trace("whenConnected");
 		connected = true;
 		handler.listen();
 	}

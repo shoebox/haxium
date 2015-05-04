@@ -2,7 +2,7 @@ package;
 
 import haxium.plugin.OpenFlHandler.OpenFlHander;
 import openfl.text.TextField;
-import haxium.protocol.Protocol;
+import haxium.protocol.Commander;
 import openfl.display.Sprite;
 import openfl.events.MouseEvent;
 

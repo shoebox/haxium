@@ -1,9 +1,8 @@
 package haxium.protocol;
 
-import haxium.protocol.By;
-import haxium.protocol.Command;
-import haxium.protocol.Element;
-import haxium.protocol.ElementCommand;
+import haxium.protocol.command.Command;
+import haxium.protocol.element.Element;
+import haxium.protocol.command.ElementFilter;
 import haxium.Server;
 import haxium.Device;
 
@@ -16,26 +15,26 @@ class Elements
 		this.device = device;
 	}
 
-	public function get(?filter:By):Array<Element>
+	public function get(?filter:ElementFilter):Array<Element>
 	{
-		var command = Command.Elements(filter);
+		var command = Command.GetChild(filter);
 		device.server.writeCommand(command);
-		var commandResult = device.server.readCommand();
-		
-		var element:Element;
+
+		// var element:Element;
 		var result:Array<Element> = [];
-		switch (commandResult)
-		{
-			case ElementsResult(list):
-				for (id in list)
-				{
-					element = new Element(id, device.server, device);
-					result.push(element);
-				}
 
-			default : 
-		}
+		// var command = device.server.readCommand();
+		// switch (command)
+		// {
+		// 	case ElementCommandResult.GetChild(list):
+		// 		for (id in list)
+		// 		{
+		// 			element = new Element(id, device);
+		// 			result.push(element);
+		// 		}
 
+		// 	default:
+		// }
 		return result;
 	}
 }

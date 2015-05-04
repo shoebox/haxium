@@ -1,11 +1,11 @@
 package;
 
-import haxium.protocol.Element;
+import haxium.protocol.element.Element;
 import massive.munit.util.Timer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 
-import haxium.protocol.By;
+import haxium.protocol.command.Command;
 
 class LibraryTest
 {
@@ -28,13 +28,15 @@ class LibraryTest
 
 	@Test public function test1List()
 	{
-		Sys.sleep(20);
-		trace("test");
-
-		movieItems = Main.currentDevice.elements.get(By.ElementType("store.companion.item.carousel.CarouselItemMovieMobile"));
-		trace(movieItems);
-		trace(movieItems[0].getProperty("entitlementDetails").getProperty("title").getProperty("value"));
-		trace(movieItems[1].getProperty("entitlementDetails").getProperty("title").getProperty("value"));
+		Sys.sleep(10);
+		var elements = Main.currentDevice.elements.get();
+		// for (element in Main.currentDevice.elements.get())
+			// trace(element);
+		
+		// movieItems = Main.currentDevice.elements.get(By.ElementType("store.companion.item.carousel.CarouselItemMovieMobile"));
+		// trace(movieItems);
+		// trace(movieItems[0].getProperty("entitlementDetails").getProperty("title").getProperty("value"));
+		// trace(movieItems[1].getProperty("entitlementDetails").getProperty("title").getProperty("value"));
 		// Assert.areEqual(2, movieItems.length);
 
 		// trace(movieItems[0].getProperty("entitlementDetails").getProperty("title").getProperty("value"));

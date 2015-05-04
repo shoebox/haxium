@@ -1,6 +1,6 @@
-package haxium.protocol;
+package haxium.protocol.command;
 
-enum By
+enum ElementFilter
 {
 	ElementId(id:String);
 	ElementType(type:String);

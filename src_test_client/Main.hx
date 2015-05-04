@@ -2,11 +2,8 @@
 import android.monkey.MonkeyDevice;
 import android.monkey.MonkeyRunner;
 import haxium.Device;
-import haxium.protocol.By;
-import haxium.protocol.Command;
-import haxium.protocol.Element;
-import haxium.protocol.ElementCommand;
-import haxium.protocol.Protocol;
+import haxium.protocol.command.Command;
+import haxium.protocol.Commander;
 import haxium.Server;
 import haxium.util.Log;
 import massive.munit.client.HTTPClient;

@@ -1,11 +1,12 @@
 package;
 
-import haxium.protocol.Element;
+import haxium.protocol.element.Element;
+import haxium.protocol.command.ElementFilter;
 import massive.munit.util.Timer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 
-import haxium.protocol.By;
+import haxium.protocol.command.Command;
 
 class LoginTest 
 {
@@ -34,7 +35,7 @@ class LoginTest
 	@Test public function test1GetFields()
 	{
 		Sys.sleep(20);
-		var filter = By.ElementType("mui.input.TextInput");
+		var filter = ElementFilter.ElementType("mui.input.TextInput");
 		var inputs:Array<Element> = Main.currentDevice.elements.get(filter);
 		Assert.areEqual(inputs.length, 2);
 
@@ -44,12 +45,12 @@ class LoginTest
 		Assert.isNotNull(elementInput1);
 		Assert.isNotNull(elementInput2);
 
-		filter = By.ElementType("store.companion.account.login.form.FormViewFeedback");
+		filter = ElementFilter.ElementType("store.companion.account.login.form.FormViewFeedback");
 		inputs = Main.currentDevice.elements.get(filter);
 		Assert.areEqual(inputs.length, 1);
 		feedback = inputs[0];
 
-		filter = By.ElementType("store.companion.view.component.LabelledButton");
+		filter = ElementFilter.ElementType("store.companion.view.component.LabelledButton");
 		inputs = Main.currentDevice.elements.get(filter);
 		button = inputs[0];
 		Assert.isNotNull(button);
@@ -59,7 +60,7 @@ class LoginTest
 	{
 		elementInput1.setProperty("data", "");
 		elementInput2.setProperty("data", "");
-		button.click();
+		button.tap();
 	
 		var errorText = feedback.getProperty("errorText");			
 		var both = "- this field is required\n- this field is required";
@@ -70,7 +71,7 @@ class LoginTest
 	{
 		elementInput1.setProperty("data", "aaaaa@aaaaa.com");
 		elementInput2.setProperty("data", "");
-		button.click();
+		button.tap();
 	
 		var errorText = feedback.getProperty("errorText");			
 		var both = "this field is required";
@@ -81,7 +82,7 @@ class LoginTest
 	{
 		elementInput1.setProperty("data", "aaaaaaaaaa.com");
 		elementInput2.setProperty("data", "12345qq");
-		button.click();
+		button.tap();
 	
 		var errorText = feedback.getProperty("errorText");			
 		var invalidEmail = "Please enter a valid email address";
@@ -92,7 +93,7 @@ class LoginTest
 	{
 		elementInput1.setProperty("data", "aaaaa@aaaaa.com");
 		elementInput2.setProperty("data", "12345");
-		button.click();
+		button.tap();
 	
 		var errorText = feedback.getProperty("errorText");			
 		var invalidPassword = "The password must be at least 6 characters long.";
@@ -103,7 +104,7 @@ class LoginTest
 	{
 		elementInput1.setProperty("data", "aaaaa@aaaaa.com");
 		elementInput2.setProperty("data", "123456");
-		button.click();
+		button.tap();
 		
 		Sys.sleep(10);
 
@@ -114,25 +115,25 @@ class LoginTest
 	
 	@Test public function test7Help()
 	{
-		var filter:By;
+		var filter:ElementFilter;
 		var elems:Array<Element>;
 
-		filter = By.ElementType("app.view.common.TouchDataButton");
+		filter = ElementFilter.ElementType("app.view.common.TouchDataButton");
 		elems = Main.currentDevice.elements.get(filter);
-		elems[0].click();
+		elems[0].tap();
 
 		Sys.sleep(1);
 
-		filter = By.ElementType("store.companion.account.login.help.LoginHelpViewMobile");
+		filter = ElementFilter.ElementType("store.companion.account.login.help.LoginHelpViewMobile");
 		elems = Main.currentDevice.elements.get(filter);
 		Assert.areEqual(1, elems.length);
 
-		filter = By.ElementType("store.companion.view.component.PanelLabelledButton");
+		filter = ElementFilter.ElementType("store.companion.view.component.PanelLabelledButton");
 		elems = Main.currentDevice.elements.get(filter);
 		Sys.sleep(1);
-		elems[0].click();
+		elems[0].tap();
 
-		filter = By.ElementType("store.companion.account.login.help.LoginHelpViewMobile");
+		filter = ElementFilter.ElementType("store.companion.account.login.help.LoginHelpViewMobile");
 		elems = Main.currentDevice.elements.get(filter);
 		Assert.areEqual(1, elems.length);
 		Assert.areEqual(false, elems[0].getProperty("visible"));
@@ -142,6 +143,6 @@ class LoginTest
 	{
 		elementInput1.setProperty("data", "massivisionautomation@gmail.com");
 		elementInput2.setProperty("data", "osefosef");
-		button.click();
+		button.tap();
 	}
 }

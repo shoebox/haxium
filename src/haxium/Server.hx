@@ -3,8 +3,8 @@ package haxium;
 import android.monkey.MonkeyDevice;
 import android.monkey.MonkeyRunner;
 import haxium.Device;
-import haxium.protocol.Command;
-import haxium.protocol.Protocol;
+import haxium.protocol.command.Command;
+import haxium.protocol.Commander;
 import haxium.util.Log;
 import sys.net.Host;
 import sys.net.Socket;
@@ -18,8 +18,8 @@ import cpp.vm.Thread;
 class Server
 {
 	public var port(default, null):Int;
-	public var input(default, null):Protocol;
-	public var output(default, null):Protocol;
+	public var input(default, null):Commander;
+	public var output(default, null):Commander;
 	public var remote(default, null):Socket;
 	
 	public var listenSocket:Socket;
@@ -34,14 +34,15 @@ class Server
 		this.port = port;
 	}
 
-	public function readCommand():Command
+	public function readCommand():Dynamic
 	{
-		return Protocol.readCommand(remote.input);
+		var result = Commander.readCommand(remote.input);
+		return result;
 	}
 
-	public function writeCommand(command:Command)
+	public function writeCommand(command:Dynamic)
 	{
-		return Protocol.writeCommand(remote.output, command);
+		Commander.writeCommand(remote.output, command);
 	}
 
 	public function listenForMonkey(whenMonkeyConnected:MonkeyDevice->Void)
