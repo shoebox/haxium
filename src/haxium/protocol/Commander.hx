@@ -8,12 +8,32 @@ import haxe.Unserializer;
 import haxium.util.Log;
 import sys.net.Socket;
 import haxium.protocol.command.Command;
+import haxium.protocol.command.ResponseCommand;
 
 class Commander
 {
     public static function writeCommand(output:Output, command:Command)
     {
         writeDynamic(output, command);
+    }
+
+    public static function readResponseCommand(input:Input):ResponseCommand
+    {
+         var raw = readDynamic(input);
+        var result:ResponseCommand = null;
+        try
+        {
+            result = raw;
+        }
+        catch (error:Dynamic)
+        {
+            trace("Excepted response of Command, but got " + raw + ": " + error);
+        }
+
+        #if serverbose
+        Log.trace('[Device] <<< $result', Red);
+        #end
+        return result;
     }
 
 	public static function readCommand(input:Input):Command
@@ -46,6 +66,10 @@ class Commander
         }
         output.write(lengthRaw);
         output.writeString(string);
+
+        #if serverbose
+        Log.trace('[Device] >>> $value', Green);
+        #end
     }
 
     private static function readDynamic(input:haxe.io.Input):Dynamic

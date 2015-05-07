@@ -4,16 +4,12 @@ import android.monkey.MonkeyDevice;
 import android.monkey.MonkeyRunner;
 import haxium.Device;
 import haxium.protocol.command.Command;
+import haxium.protocol.command.ResponseCommand;
 import haxium.protocol.Commander;
 import haxium.util.Log;
 import sys.net.Host;
 import sys.net.Socket;
-#if neko
-import neko.vm.Thread;
-#elseif cpp
-import cpp.vm.Thread;
-#end
-
+import haxium.util.Thread;
 
 class Server
 {
@@ -26,7 +22,8 @@ class Server
 	
 	public function new(port:Int)
 	{
-		Log.trace('\n88  88    db    Yb  dP 88 88   88 8b    d8 ', Red);
+		Log.trace('\n', Red);
+		Log.trace('88  88    db    Yb  dP 88 88   88 8b    d8 ', Red);
 		Log.trace('88  88   dPYb    YbdP  88 88   88 88b  d88 ', Red);
 		Log.trace('888888  dP__Yb   dPYb  88 Y8   8P 88YbdP88 ', Red);
 		Log.trace('88  88 dP""""Yb dP  Yb 88  YbodP  88 YY 88 ', Red);
@@ -34,9 +31,15 @@ class Server
 		this.port = port;
 	}
 
+	public function readResponse():ResponseCommand
+	{	
+		var result = Commander.readResponseCommand(remote.input);
+		return result;
+	}
+
 	public function readCommand():Dynamic
 	{
-		var result = Commander.readCommand(remote.input);
+		var result = Commander.readResponseCommand(remote.input);
 		return result;
 	}
 
@@ -47,7 +50,12 @@ class Server
 
 	public function listenForMonkey(whenMonkeyConnected:MonkeyDevice->Void)
 	{
-		MonkeyRunner.create(whenMonkeyConnected);
+		MonkeyRunner.create(function(device:MonkeyDevice)
+			{
+				device.server = this;
+				whenMonkeyConnected(device);
+			}
+		);
 	}
 
 	public function listen(whenConnected:Device->Void)

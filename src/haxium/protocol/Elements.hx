@@ -1,10 +1,12 @@
 package haxium.protocol;
 
 import haxium.protocol.command.Command;
+import haxium.protocol.command.ResponseCommand;
 import haxium.protocol.element.Element;
 import haxium.protocol.command.ElementFilter;
 import haxium.Server;
 import haxium.Device;
+import haxium.util.Log;
 
 class Elements
 {
@@ -19,22 +21,23 @@ class Elements
 	{
 		var command = Command.GetChild(filter);
 		device.server.writeCommand(command);
+		var response = device.server.readCommand();
 
-		// var element:Element;
+		var element:Element;
 		var result:Array<Element> = [];
+		switch (response)
+		{
+			case ResponseCommand.GetChilds(list):
+				for (id in list)
+				{
+					element = new Element(id, device);
+					result.push(element);	
+				}
 
-		// var command = device.server.readCommand();
-		// switch (command)
-		// {
-		// 	case ElementCommandResult.GetChild(list):
-		// 		for (id in list)
-		// 		{
-		// 			element = new Element(id, device);
-		// 			result.push(element);
-		// 		}
+			default:
+				//TODO(Johann) : Should fire a error
+		}
 
-		// 	default:
-		// }
 		return result;
 	}
 }

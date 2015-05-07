@@ -2,10 +2,12 @@ package android.monkey;
 
 import android.monkey.MonkeyRunner;
 import android.monkey.MonkeyThread;
+import haxium.Server;
 
 class MonkeyDevice
 {
-	public var thread:MonkeyThread;
+	public var thread(default, null):MonkeyThread;
+	public var server(default, default):Server;
 
 	public function new(thread:MonkeyThread)
 	{

@@ -4,18 +4,15 @@ import haxium.protocol.Commander;
 import android.monkey.MonkeyDevice;
 import android.monkey.MonkeyThread;
 import msignal.Signal;
-
-#if neko
-import neko.vm.Thread;
-#else
-import cpp.vm.Thread;
-#end
+import haxium.Server;
+import haxium.util.Thread;
 
 class MonkeyRunner
 {
 	public var device(default, default):MonkeyDevice;
 	public var listener(default, null):MonkeyDevice->Void;
 	public var thread(default, null):MonkeyThread;
+	public var server(default, default):Server;
 
 	static inline var Imports = "from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice";
 	static inline var WaitForConnection = "device = MonkeyRunner.waitForConnection()";

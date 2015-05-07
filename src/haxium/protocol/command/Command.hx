@@ -1,5 +1,7 @@
 package haxium.protocol.command;
 
+import haxium.protocol.TouchType;
+
 enum Command
 {
 	// Device

@@ -17,8 +17,6 @@ interface IDevice
 interface ITouchDevice
 {
 	function drag(startX:Int, startY:Int, endX:Int, endY:Int, duration:Float, steps:Int):Bool;
-	function press(x:Int, y:Int):Bool;
-	function tap(x:Int, y:Int):Bool;
 	function touch(x:Int, y:Int, type:TouchType):Bool;
 }
 

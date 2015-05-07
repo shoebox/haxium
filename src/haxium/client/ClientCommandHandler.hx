@@ -2,9 +2,11 @@ package haxium.client;
 
 import haxe.io.Input;
 import haxe.Timer;
+import haxium.handler.IDevice.ITouchDevice;
 import haxium.handler.IHandler;
 import haxium.protocol.command.Command;
 import haxium.protocol.command.ElementFilter;
+import haxium.protocol.command.ResponseCommand;
 import haxium.protocol.Commander;
 import haxium.util.Log;
 import haxium.util.Thread;
@@ -24,7 +26,6 @@ class ClientCommandHandler
 
 	public function listen()
 	{
-		trace("listen");
 		timer = new Timer(1);
 		timer.run = checkForMessage;
 
@@ -38,7 +39,6 @@ class ClientCommandHandler
 		var message:Dynamic = Thread.readMessage(false);
 		if (message != null)
 		{
-			trace('message');
 			var handled = false;
 			var result = handleCommand(message);
 			
@@ -46,37 +46,75 @@ class ClientCommandHandler
 		}
 	}
 
-	function handleCommand(command:Null<Command>):Dynamic
+	function handleCommand(command:Null<Command>):ResponseCommand
 	{
-		var result:Dynamic = null;
+		var result:ResponseCommand = null;
 		var child:Dynamic;
 		var handled:Bool;
 		var filter:ElementFilter;
+		var id:String;
 		for (handler in handlers)
 		{
-			result = switch (command)
+			switch (command)
 			{
 				case Command.GetProperty(childName, name):
 					filter = ElementFilter.ElementId(childName);
 					child = handler.getChild(filter);
-					handler.getProperty(child[0], name);
+					if (child.length == 0)
+					{
+						result = ResponseCommand.Invalid;
+					}
+					else
+					{
+						var property = handler.getProperty(child[0], name);
+						result = ResponseCommand.GetProperty(property);
+					}
 
 				case Command.SetProperty(childName, name, value):
 					filter = ElementFilter.ElementId(childName);
 					child = handler.getChild(filter);
-					handler.setProperty(child[0], name, value);
+					if (child.length == 0)
+					{
+						result = ResponseCommand.Invalid;
+					}
+					else
+					{
+						result = handler.setProperty(child[0], name, value) 
+							? ResponseCommand.Valid
+							: ResponseCommand.Invalid;
+					}
 
-				case Command.GetChild(by):
-					result = handler.getChild(by);
+				case Command.GetChild(filter):
+					var childs = handler.getChild(filter);
+					var list = [];
+					for (child in childs)
+					{
+						id = handler.getChildAutomationName(child);
+						list.push(id);
+					}
+					result = GetChilds(list);
 
 				case Command.GetBounds(childName):
 					filter = ElementFilter.ElementId(childName);
 					child = handler.getChild(filter);
-					result = handler.getChildBounds(child[0]);
+					var bounds = handler.getChildBounds(child[0]);
+					result = ResponseCommand.GetBounds(bounds);
 
 				case _:
 			
 			};
+
+			if (Std.is(handler, ITouchDevice))
+			{
+				var touchHandler:ITouchDevice = cast handler;
+				switch (command)
+				{
+					case Command.Touch(x, y, type):
+						result = touchHandler.touch(x, y, type) ? Valid : Invalid;
+
+					default:
+				}
+			}
 		}
 		
 		if (result != null)

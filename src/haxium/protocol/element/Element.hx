@@ -1,8 +1,10 @@
 package haxium.protocol.element;
 
 import haxium.protocol.command.Command;
+import haxium.protocol.command.ResponseCommand;
 import haxium.protocol.element.Bounds;
 import haxium.protocol.Property;
+import haxium.protocol.TouchType;
 import haxium.Server;
 import haxium.Device;
 
@@ -12,9 +14,18 @@ class Element
 	function get_bounds():Bounds
 	{
 		var command = Command.GetBounds(id);
-		var result = runCommand(command);
-		var bounds:Bounds = cast result;
-		return bounds;
+		var commandResult = runCommand(command);
+		var response:ResponseCommand = cast commandResult;
+		var result:Bounds = null;
+		switch (response)
+		{
+			case ResponseCommand.GetBounds(bounds):
+				result = bounds;
+
+			default:
+		}
+
+		return result;
 	}
 
 	public var device(default, null):Device;
@@ -31,7 +42,7 @@ class Element
 		return "Element ::: " + id;
 	}
 
-	function runCommand(command:Dynamic):Dynamic
+	function runCommand(command:Dynamic):ResponseCommand
 	{	
 		device.server.writeCommand(command);
 		var result = device.server.readCommand();
@@ -50,15 +61,28 @@ class Element
 	public function getProperty(property:String):Dynamic
 	{
 		var command = Command.GetProperty(id, property);
-		var property:Property = runCommand(command);	
+		var response:ResponseCommand = runCommand(command);	
+		var property:Property = null;
+
+		switch (response)
+		{
+			case ResponseCommand.GetProperty(value):
+				property = value;
+
+			default:
+		};
+
 		var result:Dynamic = null;
-		if (property.type == PropertyType.Element)
+		if (property != null)
 		{
-			result = new Element(property.value, device);
-		}
-		else
-		{
-			result = property.value;
+			if (property.type == PropertyType.Element)
+			{
+				result = new Element(property.value, device);
+			}
+			else
+			{
+				result = property.value;
+			}
 		}
 
 		return result;
@@ -66,26 +90,44 @@ class Element
 
 	// Device command ----------------------------------------------------------
 
-	public function press():Bool
+	public function tap()
 	{
-		var center = getCenter();
-		var result = device.press(center.x, center.y);
-		return result;
+		touch(TouchType.Down);
+		touch(TouchType.Up);
 	}
 
-	public function tap():Bool
+	public function touch(type:TouchType)
 	{
-		var center = getCenter();
-		var result = device.tap(center.x, center.y);
-		return result;
+		deviceTouch(type);
 	}
 
-	public function touch(type:TouchType):Bool
+	function deviceTouch(type:TouchType):Bool
 	{
 		var center = getCenter();
 		var result = device.touch(center.x, center.y, type);
 		return result;
 	}
+
+	// public function press():Bool
+	// {
+	// 	var center = getCenter();
+	// 	var result = device.press(center.x, center.y);
+	// 	return result;
+	// }
+
+	// public function tap():Bool
+	// {
+	// 	var center = getCenter();
+	// 	var result = device.tap(center.x, center.y);
+	// 	return result;
+	// }
+
+	// public function touch(type:TouchType):Bool
+	// {
+	// 	var center = getCenter();
+	// 	var result = device.touch(center.x, center.y, type);
+	// 	return result;
+	// }
 
 	function getCenter():Point
 	{
